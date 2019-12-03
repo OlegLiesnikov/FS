@@ -1,4 +1,4 @@
-﻿open System.Diagnostics
+open System.Diagnostics
 open System.Collections.Generic
 
 //---------------------------------------------------------------
@@ -991,12 +991,10 @@ let headers =  splitCommas stockData.Head
 let openIndex = Seq.findIndex (fun elem -> elem ="Open" ) headers 
 let closeIndex = Seq.findIndex (fun elem -> elem ="Close" ) headers 
 let values =  List.map splitCommas stockData.Tail
-Seq.Max (fun x y -> abs x - y) values
-let maxVariance fun =  abs a-b  // greatest variance between the opening and closing price
-
-let result =  splitCommas stockData |>  //and put your result here to check your work
-
-AssertEquality "2012-3-13" result
+let m = Seq.maxBy (fun (s: string list) -> s.[openIndex; closeIndex] |> Seq.map System.Double.Parse |> Seq.fold (-) |> abs) values
+m.[0]
+[|1; 2; 3; 4|].GetValue([|2;3|])
+AssertEquality "2012-3-13" m.[0]
 
 
 // ---------------------------------------------------------------
