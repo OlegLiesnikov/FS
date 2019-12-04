@@ -991,11 +991,11 @@ let headers =  splitCommas stockData.Head
 let openIndex = Seq.findIndex (fun elem -> elem ="Open" ) headers 
 let closeIndex = Seq.findIndex (fun elem -> elem ="Close" ) headers 
 let values =  List.map splitCommas stockData.Tail
-let m = Seq.maxBy (fun (s: string list) -> s.[openIndex; closeIndex] |> Seq.map System.Double.Parse |> Seq.fold (-) |> abs) values
+let m = Seq.maxBy(fun (s: string [] ) -> [for i in [openIndex; closeIndex] -> System.Double.Parse s.[i]]|> Seq.fold (fun s x -> s-x|> abs) 0.0) values
+//let m = Seq.maxBy (fun (s: string list) -> [for i in [openIndex; closeIndex] -> s.[i]]  |> Seq.map System.Double.Parse |> Seq.fold (-) |> abs) values
 m.[0]
-[|1; 2; 3; 4|].GetValue([|2;3|])
+//[for i in [1;2] -> [1; 2; 3; 4].[i]]
 AssertEquality "2012-3-13" m.[0]
-
 
 // ---------------------------------------------------------------
 // Record Types
@@ -1014,8 +1014,8 @@ type Character = {
 
 let mario = { Name = "Mario"; Occupation = "Plumber"; }
 
-AssertEquality mario.Name __
-AssertEquality mario.Occupation __
+AssertEquality mario.Name "Mario"
+AssertEquality mario.Occupation "Plumber"
 
 // ---------------------------------------------------------------
 
@@ -1024,11 +1024,11 @@ AssertEquality mario.Occupation __
 let mario = { Name = "Mario"; Occupation = "Plumber"; }
 let luigi = { mario with Name = "Luigi"; }
 
-AssertEquality mario.Name __
-AssertEquality mario.Occupation __
+AssertEquality mario.Name "Mario"
+AssertEquality mario.Occupation "Plumber"
 
-AssertEquality luigi.Name __
-AssertEquality luigi.Occupation __
+AssertEquality luigi.Name "Luigi"
+AssertEquality luigi.Occupation "Plumber"
 
 // ---------------------------------------------------------------
 
@@ -1050,8 +1050,8 @@ let bowserComparison =
     else
         "he is still kind of a koopa"
 
-AssertEquality koopaComparison __
-AssertEquality bowserComparison __
+AssertEquality koopaComparison "all the koopas are pretty much the same"
+AssertEquality bowserComparison "he is still kind of a koopa"
 
 // ---------------------------------------------------------------
 
@@ -1066,9 +1066,9 @@ let determineSide character =
     | { Occupation = "Plumber" } -> "good guy"
     | _ -> "bad guy"
 
-AssertEquality (determineSide mario) __
-AssertEquality (determineSide luigi) __
-AssertEquality (determineSide bowser) __
+AssertEquality (determineSide mario) "good guy"
+AssertEquality (determineSide luigi) "good guy"
+AssertEquality (determineSide bowser) "bad guy"
 
 // ---------------------------------------------------------------
 
@@ -1085,18 +1085,20 @@ AssertEquality (determineSide bowser) __
 
 let someValue = Some 10
 
-AssertEquality someValue.IsSome __
-AssertEquality someValue.IsNone __
-AssertEquality someValue.Value __
+AssertEquality someValue.IsSome true
+AssertEquality someValue.IsNone false
+AssertEquality someValue.Value 10
 
 // ---------------------------------------------------------------
 
 // ---- ...but they might not ------------------------------------
 let noValue = None
+//let f  = fun () -> noValue.Value
+//f
+AssertEquality noValue.IsSome false
+AssertEquality noValue.IsNone true
 
-AssertEquality noValue.IsSome __
-AssertEquality noValue.IsNone __
-AssertThrows<FILL_IN_THE_EXCEPTION> (fun () -> noValue.Value)
+//AssertThrows<FILL_IN_THE_EXCEPTION> (fun () -> noValue.Value)
 
 // ---------------------------------------------------------------
 
@@ -1125,8 +1127,8 @@ let getScore game =
     | Some score -> translate score
     | None -> "Unknown"
 
-AssertEquality (getScore chronoTrigger) __
-AssertEquality (getScore halo) __
+AssertEquality (getScore chronoTrigger) "Great"
+AssertEquality (getScore halo) "Unknown"
 
 // ---------------------------------------------------------------
 
@@ -1140,8 +1142,8 @@ let decideOn game =
     |> Option.map (fun score -> if score > 3 then "play it" else "don't play")
 
 //HINT: look at the return type of the decide on function
-AssertEquality (decideOn chronoTrigger) __
-AssertEquality (decideOn gta) __
+AssertEquality (decideOn chronoTrigger) (Some "play it")
+AssertEquality (decideOn gta) None
 
 // ---------------------------------------------------------------
 
@@ -1169,7 +1171,7 @@ let toColor condiment =
 
 let choice = Mustard
 
-AssertEquality (toColor choice) __
+AssertEquality (toColor choice) "yellow"
 
 (* TRY IT: What happens if you remove a case from the above pattern 
            match? *)
@@ -1192,8 +1194,8 @@ let saySomethingAboutYourFavorite favorite =
 let bourbonResult = saySomethingAboutYourFavorite <| Bourbon "Maker's Mark"
 let numberResult = saySomethingAboutYourFavorite <| Number 7
 
-AssertEquality bourbonResult __
-AssertEquality numberResult __
+AssertEquality bourbonResult null
+AssertEquality numberResult "me to!"
 
 // ---------------------------------------------------------------
 
@@ -1226,11 +1228,11 @@ module MushroomKingdom =
         { character with Power = Some Mushroom }
 
 
-AssertEquality MushroomKingdom.Mario.Name __
-AssertEquality MushroomKingdom.Mario.Occupation __
+AssertEquality MushroomKingdom.Mario.Name "Mario"
+AssertEquality MushroomKingdom.Mario.Occupation "Plumber"
 
 let moduleType = MushroomKingdom.Mario.GetType()
-AssertEquality moduleType typeof<FILL_ME_IN>
+AssertEquality moduleType typeof<MushroomKingdom.Power>
 
 //---------------------------------------------------------------
 
@@ -1238,7 +1240,7 @@ AssertEquality moduleType typeof<FILL_ME_IN>
 
 let superMario = MushroomKingdom.powerUp MushroomKingdom.Mario
 
-AssertEquality superMario.Power __
+AssertEquality superMario.Power  (Some MushroomKingdom.Mushroom)
 
 (* NOTE: In previous sections, you've seen modules like List and Option that 
          contain useful functions for dealing with List types and Option types
@@ -1250,8 +1252,8 @@ AssertEquality superMario.Power __
 open MushroomKingdom
 
 let OpenedModulesBringTheirContentsInScope() = 
-    AssertEquality Mario.Name __
-    AssertEquality Mario.Occupation __
+    AssertEquality Mario.Name "Mario"
+    AssertEquality Mario.Occupation "Plumber"
 
 //---------------------------------------------------------------
 
@@ -1274,7 +1276,7 @@ type Zombie() =
 
 let zombie = new Zombie()
 
-AssertEquality zombie.FavoriteFood __
+AssertEquality zombie.FavoriteFood "brains"
 
 //---------------------------------------------------------------
 
@@ -1283,7 +1285,7 @@ AssertEquality zombie.FavoriteFood __
 let zombie = new Zombie()
 
 let result = zombie.Eat "brains"
-AssertEquality result __
+AssertEquality result "mmmmmmmmmmmmmmm"
 
 //---------------------------------------------------------------
  
@@ -1297,7 +1299,7 @@ type Person(name:string) =
 let person = new Person("Shaun")
 
 let result = person.Speak()
-AssertEquality result __
+AssertEquality result "Hi my name is Shaun"
 
 //---------------------------------------------------------------
 
@@ -1310,9 +1312,8 @@ type Zombie2() =
         if food = favoriteFood then "mmmmmmmmmmmmmmm" else "grrrrrrrr"
 
 let zombie = new Zombie2()
-
 let result = zombie.Eat "chicken"
-AssertEquality result __
+AssertEquality result "brains"
 
 (* TRY IT: Can you access the let bound value Zombie2.favoriteFood
            outside of the class definition? *)
@@ -1334,10 +1335,10 @@ type Person2(name:string) =
 let person = new Person2("Shaun")
 
 let firstPhrase = person.Speak()
-AssertEquality firstPhrase __
+AssertEquality firstPhrase "Hi my name is Shaun"
 
 person.Name <- "Shaun of the Dead"
 let secondPhrase = person.Speak()
-AssertEquality secondPhrase __
+AssertEquality secondPhrase "Hi my name is Shaun of the Dead"
 
 //---------------------------------------------------------------
